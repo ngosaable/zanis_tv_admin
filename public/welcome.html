@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zanis TV — Watch live channels, programmes, and kids TV. Your home for entertainment.">
+    <title>Zanis TV — Welcome</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/welcome.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon"><i class="fas fa-tv"></i></div>
+                <span>Zanis TV</span>
+            </a>
+            <nav>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#live-channels">Live Channels</a></li>
+                    <li><a href="#programmes">Programmes</a></li>
+                    <li><a href="#kids-tv">Kids TV</a></li>
+                    <li><a href="/login" class="btn btn-outline" style="padding:0.45rem 1rem;">Admin Login</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse"></span>
+                    Now Streaming Live
+                </div>
+                <h1>Welcome to <span>Zanis TV</span></h1>
+                <p>Your destination for live television, on-demand programmes, and family-friendly kids channels — all in one place.</p>
+                <div class="hero-actions">
+                    <a href="#live-channels" class="btn btn-gold"><i class="fas fa-play"></i> Watch Live</a>
+                    <a href="#programmes" class="btn btn-outline"><i class="fas fa-film"></i> Browse Programmes</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-screen" id="heroFeatured">
+                    <div class="hero-screen-placeholder">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>Live TV Preview</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="statChannels">—</div>
+                <div class="stat-label">Live Channels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statProgrammes">—</div>
+                <div class="stat-label">Programmes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statKids">—</div>
+                <div class="stat-label">Kids Channels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statCategories">—</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section" id="live-channels">
+        <div class="section-header">
+            <div>
+                <div class="section-title">
+                    <div class="section-icon live"><i class="fas fa-broadcast-tower"></i></div>
+                    <div>
+                        <h2>Live Channels</h2>
+                        <p class="section-subtitle">Watch your favourite stations broadcasting right now</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="channels-grid loading-grid" id="channelsGrid"></div>
+    </section>
+
+    <section class="section" id="programmes">
+        <div class="section-header">
+            <div>
+                <div class="section-title">
+                    <div class="section-icon programmes"><i class="fas fa-clapperboard"></i></div>
+                    <div>
+                        <h2>Live Programmes</h2>
+                        <p class="section-subtitle">Movies, documentaries, and shows on demand</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="programmes-scroll loading-grid" id="programmesGrid"></div>
+    </section>
+
+    <section class="section kids-section" id="kids-tv">
+        <div class="section-header">
+            <div>
+                <div class="section-title">
+                    <div class="section-icon kids"><i class="fas fa-child"></i></div>
+                    <div>
+                        <h2>Kids TV Channels</h2>
+                        <p class="section-subtitle">Safe, fun, and educational content for the whole family</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="kids-grid" id="kidsGrid"></div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-tv"></i></div>
+                    <span>Zanis TV</span>
+                </div>
+                <p>Bringing entertainment to your screen, anytime.</p>
+            </div>
+            <ul class="footer-links">
+                <li><a href="#live-channels">Live TV</a></li>
+                <li><a href="#programmes">Programmes</a></li>
+                <li><a href="#kids-tv">Kids TV</a></li>
+                <li><a href="/login">Admin</a></li>
+            </ul>
+            <p class="footer-copy">&copy; 2026 Zanis TV. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="playerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Now Playing</h3>
+                <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-player">
+                <video id="playerVideo" controls playsinline></video>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+    <script src="js/welcome.js"></script>
+</body>
+</html>
