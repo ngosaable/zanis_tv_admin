@@ -15,5 +15,11 @@ class Role extends Model
         'description',
     ];
 
-
+    /**
+     * Users are linked by the role *name* stored in users.role
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class, 'role', 'name');
+    }
 }

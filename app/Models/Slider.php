@@ -11,6 +11,9 @@ class Slider extends Model
 
     protected $fillable = [
         'title',
+        'subtitle',
+        'title_color',
+        'subtitle_color',
         'image',
         'linked_type',   // movie|live_channel|documentary|none
         'linked_id',

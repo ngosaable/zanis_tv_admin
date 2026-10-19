@@ -2,6 +2,14 @@
 
 return [
 
+    'ffmpeg' => [
+        // Full path to the binaries if they are not on your PATH,
+        // e.g. C:\ffmpeg\bin\ffmpeg.exe
+        'ffmpeg' => env('FFMPEG_BINARY', 'ffmpeg'),
+        'ffprobe' => env('FFPROBE_BINARY', 'ffprobe'),
+    ],
+
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

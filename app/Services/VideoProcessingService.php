@@ -9,6 +9,31 @@ use Illuminate\Support\Str;
 class VideoProcessingService
 {
     /**
+     * Binaries (configurable via FFMPEG_BINARY / FFPROBE_BINARY in .env)
+     */
+    protected function ffmpeg(): string
+    {
+        return config('services.ffmpeg.ffmpeg', 'ffmpeg');
+    }
+
+    protected function ffprobe(): string
+    {
+        return config('services.ffmpeg.ffprobe', 'ffprobe');
+    }
+
+    /**
+     * Safely turn an ffprobe frame rate like "30000/1001" into a float.
+     */
+    protected function parseFrameRate(string $rate): float
+    {
+        if (str_contains($rate, '/')) {
+            [$num, $den] = array_map('floatval', explode('/', $rate, 2));
+            return $den > 0 ? round($num / $den, 3) : 0.0;
+        }
+        return (float) $rate;
+    }
+
+    /**
      * Available quality presets for HLS conversion
      */
     public static function getQualityPresets(): array
@@ -66,7 +91,8 @@ class VideoProcessingService
 
         // Get video info using FFmpeg
         $command = sprintf(
-            'ffprobe -v quiet -print_format json -show_format -show_streams %s',
+            '%s -v quiet -print_format json -show_format -show_streams %s',
+            escapeshellarg($this->ffprobe()),
             escapeshellarg($videoPath)
         );
 
@@ -94,7 +120,7 @@ class VideoProcessingService
             'resolution' => sprintf('%dx%d', $videoStream['width'] ?? 0, $videoStream['height'] ?? 0),
             'file_size' => $data['format']['size'] ?? 0,
             'bitrate' => $data['format']['bit_rate'] ?? 0,
-            'fps' => eval('return ' . ($videoStream['r_frame_rate'] ?? '0/1') . ';'),
+            'fps' => $this->parseFrameRate($videoStream['r_frame_rate'] ?? '0/1'),
         ];
     }
 
@@ -135,7 +161,8 @@ class VideoProcessingService
         
         // Build FFmpeg command with progress output to stderr
         $cmd = sprintf(
-            "ffmpeg -progress pipe:1 -i \"%s\" -c:v libx264 -c:a aac -movflags +faststart -vf scale=%d:%d -b:v %s -maxrate %s -bufsize %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename \"%s\\segment_%%03d.ts\" -y \"%s\" 2>&1",
+            "%s -progress pipe:1 -i \"%s\" -c:v libx264 -c:a aac -movflags +faststart -vf scale=%d:%d -b:v %s -maxrate %s -bufsize %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename \"%s" . DIRECTORY_SEPARATOR . "segment_%%03d.ts\" -y \"%s\" 2>&1",
+            $this->ffmpeg(),
             $videoPath,
             $preset['width'],
             $preset['height'],
@@ -309,11 +336,14 @@ class VideoProcessingService
         
         foreach ($generatedQualities as $q) {
             $bandwidth = (int) str_replace('k', '000', $q['bitrate']);
+            // Each variant lives in its own sibling folder (videos/hls/<uuid>/playlist.m3u8),
+            // so reference it relative to this master playlist's folder.
+            $variantRelative = '../' . basename(dirname($q['playlist_path'])) . '/playlist.m3u8';
             $masterContent .= sprintf(
                 "#EXT-X-STREAM-INF:BANDWIDTH=%d,RESOLUTION=%s\n%s\n",
                 $bandwidth,
                 $q['resolution'],
-                $q['playlist_path']
+                $variantRelative
             );
         }
         
@@ -354,7 +384,8 @@ class VideoProcessingService
         }
 
         $command = sprintf(
-            'ffmpeg -i %s -ss %s -vframes 1 -y %s 2>&1',
+            '%s -i %s -ss %s -vframes 1 -y %s 2>&1',
+            escapeshellarg($this->ffmpeg()),
             escapeshellarg($videoPath),
             escapeshellarg($time),
             escapeshellarg($fullThumbnailPath)
@@ -374,8 +405,8 @@ class VideoProcessingService
      */
     public function checkFFmpeg(): bool
     {
-        $version = shell_exec('ffmpeg -version 2>&1');
-        return strpos($version, 'ffmpeg') !== false;
+        $version = shell_exec(escapeshellarg($this->ffmpeg()) . ' -version 2>&1');
+        return $version && strpos($version, 'ffmpeg') !== false;
     }
 
     /**
@@ -383,7 +414,7 @@ class VideoProcessingService
      */
     public function checkFFprobe(): bool
     {
-        $version = shell_exec('ffprobe -version 2>&1');
-        return strpos($version, 'ffprobe') !== false;
+        $version = shell_exec(escapeshellarg($this->ffprobe()) . ' -version 2>&1');
+        return $version && strpos($version, 'ffprobe') !== false;
     }
 }

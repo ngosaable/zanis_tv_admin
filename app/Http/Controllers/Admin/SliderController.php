@@ -24,6 +24,9 @@ public function store(Request $request)
     {
         $request->validate([
             'title' => 'nullable|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'title_color' => 'nullable|string|max:20',
+            'subtitle_color' => 'nullable|string|max:20',
             'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'linked_type' => 'required|in:movie,live_channel,series,none',
             'linked_id' => 'nullable|integer',
@@ -31,7 +34,7 @@ public function store(Request $request)
             'status' => 'required|boolean',
         ]);
 
-        $data = $request->only(['title','linked_type','linked_id','order','status']);
+        $data = $request->only(['title','subtitle','title_color','subtitle_color','linked_type','linked_id','order','status']);
         $data['sort_order'] = $data['order'];
         unset($data['order']);
 
@@ -52,6 +55,9 @@ public function store(Request $request)
     {
         $request->validate([
             'title' => 'nullable|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'title_color' => 'nullable|string|max:20',
+            'subtitle_color' => 'nullable|string|max:20',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'linked_type' => 'required|in:movie,live_channel,series,none',
             'linked_id' => 'nullable|integer',
@@ -59,7 +65,7 @@ public function store(Request $request)
             'status' => 'required|boolean',
         ]);
 
-        $data = $request->only(['title','linked_type','linked_id','order','status']);
+        $data = $request->only(['title','subtitle','title_color','subtitle_color','linked_type','linked_id','order','status']);
         $data['sort_order'] = $data['order'];
         unset($data['order']);
 

@@ -20,6 +20,12 @@ Route::get('/', function () {
     return redirect('/welcome.html');
 });
 
+// Breeze sends users to /dashboard after login (RouteServiceProvider::HOME).
+// Forward that to the real admin dashboard.
+Route::middleware('auth')->get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
+})->name('dashboard');
+
 
 
 /**
@@ -27,7 +33,7 @@ Route::get('/', function () {
  * URL prefix: /admin/...
  * Names: admin.*
  */
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     /**
      * ✅ ADMIN DASHBOARD

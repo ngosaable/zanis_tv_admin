@@ -79,8 +79,7 @@ class Video extends Model
         if (!$path) return null;
 
         // Ensure the path doesn't start with 'storage/' to avoid double storage in URL
-        $cleanPath = ltrim($path, '/');
-        $cleanPath = ltrim($cleanPath, 'storage/');
+        $cleanPath = self::cleanStoragePath($path);
 
         return asset('storage/' . $cleanPath);
     }
@@ -90,8 +89,7 @@ class Video extends Model
         if (!$this->thumbnail) return null;
 
         // Ensure the path doesn't start with 'storage/' to avoid double storage in URL
-        $cleanPath = ltrim($this->thumbnail, '/');
-        $cleanPath = ltrim($cleanPath, 'storage/');
+        $cleanPath = self::cleanStoragePath($this->thumbnail);
 
         return asset('storage/' . $cleanPath);
     }
@@ -105,8 +103,7 @@ class Video extends Model
         }
         
         // Ensure the path doesn't start with 'storage/' to avoid double storage in URL
-        $cleanPath = ltrim($this->video_path, '/');
-        $cleanPath = ltrim($cleanPath, 'storage/');
+        $cleanPath = self::cleanStoragePath($this->video_path);
 
         return asset('storage/' . $cleanPath);
     }
@@ -116,10 +113,19 @@ class Video extends Model
         if (!$this->hls_playlist_path) return null;
         
         // Ensure the path doesn't start with 'storage/' to avoid double storage in URL
-        $cleanPath = ltrim($this->hls_playlist_path, '/');
-        $cleanPath = ltrim($cleanPath, 'storage/');
+        $cleanPath = self::cleanStoragePath($this->hls_playlist_path);
 
         return asset('storage/' . $cleanPath);
+    }
+
+    /**
+     * Strip a leading "/" and "storage/" prefix from a stored path.
+     * (ltrim($path, 'storage/') strips *characters*, not a prefix, and would
+     * turn e.g. "thumbs/a.jpg" into "humbs/a.jpg".)
+     */
+    protected static function cleanStoragePath(string $path): string
+    {
+        return preg_replace('#^/?(storage/)?#', '', $path);
     }
 
     /**

@@ -38,7 +38,7 @@ class ResetAdminPassword extends Command
                 'name' => 'Admin',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('admin123'),
-                'role' => 'admin',
+                'role' => 'super_admin',
             ]);
             
             $this->info('Admin user created successfully!');
