@@ -53,6 +53,15 @@ class LiveChannelController extends Controller
             ->with('success', 'Live channel created successfully');
     }
 
+    /**
+     * There is no separate "view" page for a channel; open the edit form instead.
+     * (Route::resource registers this route, so without it the app crashes.)
+     */
+    public function show(LiveChannel $live_channel)
+    {
+        return redirect()->route('admin.live-channels.edit', $live_channel);
+    }
+
     public function edit(LiveChannel $live_channel)
     {
         $categories = Category::where('status', 1)->get();

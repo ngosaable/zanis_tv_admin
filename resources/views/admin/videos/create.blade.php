@@ -528,7 +528,26 @@ input:checked + .dstv-quality-adaptive {
 let currentChunk = 0;
 let totalChunks = 0;
 let fileToUpload = null;
-let chunkSize = 5 * 1024 * 1024; // 5MB chunks
+@php
+    // Size chunks from the limits PHP is *actually* running with, so uploads work
+    // even if php.ini still has the defaults (upload_max_filesize=2M, post_max_size=8M).
+    $iniToBytes = function ($value) {
+        $value = trim((string) $value);
+        if ($value === '' || $value === '0' || $value === '-1') return PHP_INT_MAX; // 0 / -1 = unlimited
+        $number = (float) $value;
+        switch (strtolower(substr($value, -1))) {
+            case 'g': $number *= 1024;
+            case 'm': $number *= 1024;
+            case 'k': $number *= 1024;
+        }
+        return (int) $number;
+    };
+    $serverUploadLimit = min($iniToBytes(ini_get('upload_max_filesize')), $iniToBytes(ini_get('post_max_size')));
+    // 80% of the limit (room for the other form fields), never above 5MB or below 256KB
+    $chunkBytes = (int) max(256 * 1024, min(5 * 1024 * 1024, floor($serverUploadLimit * 0.8)));
+@endphp
+// Server limits: upload_max_filesize={{ ini_get('upload_max_filesize') }}, post_max_size={{ ini_get('post_max_size') }}
+let chunkSize = {{ $chunkBytes }}; // bytes per chunk (max 5MB)
 let activeVideoPreviewUrl = null;
 
 const QUALITY_OPTIONS = {
@@ -908,7 +927,9 @@ function handleUpload() {
     const file = videoInput.files[0];
     fileToUpload = file;
     
-    if (file.size <= 20 * 1024 * 1024) {
+    // Only very small files go in one request. PHP's default post_max_size is 8MB,
+    // so anything larger is sent in 5MB chunks (see chunkSize) to stay under the limit.
+    if (file.size <= Math.min(4 * 1024 * 1024, chunkSize)) {
         uploadNormal(form);
         return;
     }
